@@ -1,6 +1,7 @@
 from selenium import webdriver
 from controladores.intel import getOfertasIntel
 from controladores.oracle import getOfertasOracle
+from procesamiento import procesarOfertas
 
 options = webdriver.ChromeOptions()
 options.add_argument("--headless")
@@ -8,15 +9,10 @@ options.add_argument("--headless")
 driver = webdriver.Chrome(options=options)
 
 if __name__ == "__main__":
-    index=0
-    ofertas = getOfertasOracle(driver,index)
-    print("Ofertas Oracle:")
-    for oferta in ofertas:
-        print(oferta)
-    ofertas = getOfertasIntel(driver,index)
-    print("--------------------------------")
-    print("Ofertas Intel:")
-    for oferta in ofertas:
-        print(oferta)
-    print("Fin del programa")
+    index=int(0)
+    ofertas=[]
+    index = getOfertasOracle(driver, index, ofertas)
+    index = getOfertasIntel(driver, index, ofertas)
+    print(f"Se encontraron {len(ofertas)} ofertas en total.")
+    procesarOfertas(ofertas)
     driver.quit()

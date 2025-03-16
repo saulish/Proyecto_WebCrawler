@@ -4,21 +4,19 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 
 
-def getOfertasOracle(driver,indice):
+def getOfertasOracle(driver,indice,ofertas):
     url="https://careers.oracle.com/jobs/#en/sites/jobsearch/requisitions?keyword=Internship&location=ZAPOPAN%2C+JALISCO%2C+Mexico&locationId=300000313566531&locationLevel=city&mode=location&radius=25&radiusUnit=KM"
     driver.get(url)
-    ofertas=[]
     # Espera a que cargue el contenedor con los listados de ofertas
     print("Esperando a que carguen las ofertas...")
-    wait = WebDriverWait(driver, 15)
 
-    
+    wait = WebDriverWait(driver, 25)
     job_results_container = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "jobs-grid__list")))
     jobs_links = job_results_container.find_elements(By.TAG_NAME, "a")
 
     job_cards = job_results_container.find_elements(By.CLASS_NAME, "job-grid-item__content")
 
-    print(f"Se encontraron {len(job_cards)} ofertas de empleo:")
+    print(f"Se encontraron {len(job_cards)} ofertas de empleo en Oracle")
 
     # Iteramos sobre cada oferta y extraemos la información
     for index, card in enumerate(job_cards, start=1):
@@ -32,7 +30,7 @@ def getOfertasOracle(driver,indice):
             # Extraer el enlace a la oferta (suponiendo que se encuentre en un <a>)
             job_link = jobs_links[index].get_attribute("href")
 
-            oferta="Oferta "+str(index+indice)+":\n"+"  Título: "+job_title+"\n"+"  Ubicación: "+job_location+"\n"+"  Link: "+job_link
+            oferta="Oferta: "+str(index+indice)+"\nEmpresa: Oracle"+"\n"+"  Título: "+job_title+"\n"+"  Ubicación: "+job_location+"\n"+"  Link: "+job_link
             ofertas.append(oferta)
             """
             
@@ -44,8 +42,11 @@ def getOfertasOracle(driver,indice):
             """
         except Exception as e:
             print(f"Error extrayendo datos de la oferta {index}: {e}")
-
     # Espera un poco antes de cerrar para observar resultados (opcional)
     time.sleep(5)
     
-    return ofertas
+    return indice+len(job_cards)
+
+
+    
+
