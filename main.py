@@ -84,18 +84,22 @@ def getofertas(empresa, index, ofertas):
             #intentos[empresa] += 1
 
 
-            
 if __name__ == "__main__":
     index=int(0)
+    _=0
     ofertas=[]
     maxIntentos=3
     tmpEmpresas = empresas.copy()
     while len(tmpEmpresas) > 0:
+        if _%3==0 and _!=0:
+            print("Esperando 5 segundos para evitar bloqueos...")
+            time.sleep(5)
         empresa = tmpEmpresas[0]
         getofertas(empresa, index, ofertas)
         if intentos[empresa] >= maxIntentos:
             tmpEmpresas.remove(empresa)
             print(f"Se han hecho 3 intentos fallidos para {empresa}. Se eliminará de la lista.")
+        _+=1
     print(f"Se han encontrado {len(ofertas)} ofertas de trabajo.")
     procesarOfertas(ofertas)
     #JABIL
