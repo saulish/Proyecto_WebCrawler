@@ -54,3 +54,62 @@ def procesarOfertas(ofertas):
         json.dump(structured_offers, file, indent=4, ensure_ascii=False)
 
     print("¡Archivo JSON generado correctamente con estructura [empresa][titulo]!")
+
+
+def generar_msj(lista_empresas, json_path='ofertas.json'):
+    """
+    Lee el archivo JSON ubicado en 'json_path' y genera un informe en forma de string
+    que contiene la información de las ofertas para cada empresa presente en 'lista_empresas'.
+    
+    El JSON se asume estructurado como:
+    
+    {
+        "Empresa1": {
+            "Título Oferta 1": {
+                "Ubicacion": "...",
+                "Link": "..."
+            },
+            "Título Oferta 2": {
+                "Ubicacion": "...",
+                "Link": "..."
+            },
+            ...
+        },
+        "Empresa2": {
+            ...
+        }
+    }
+    
+    Para cada empresa en la lista se agrega al informe un encabezado y luego se listan las ofertas.
+    
+    Args:
+        json_path (str): Ruta al archivo JSON con la información de ofertas.
+        lista_empresas (list): Lista de nombres de empresas a incluir en el informe.
+    
+    Returns:
+        str: Un string que contiene toda la información estructurada de las ofertas.
+    """
+    try:
+        with open(json_path, "r", encoding="utf-8") as file:
+            data = json.load(file)
+    except Exception as e:
+        return f"Error al cargar el archivo JSON: {e}"
+    
+    informe = ""
+    for empresa in lista_empresas:
+        informe += f"Empresa: {empresa}\n"
+        # Verificar si la empresa existe en el JSON
+        if empresa in data:
+            ofertas = data[empresa]
+            for titulo, detalles in ofertas.items():
+                ubicacion = detalles.get("Ubicacion", "N/A")
+                link = detalles.get("Link", "N/A")
+                
+                informe += f"  Título: {titulo}\n"
+                informe += f"    Ubicación: {ubicacion}\n"
+                informe += f"    Link: {link}\n"
+            informe += "\n"  # Línea en blanco para separar empresas
+        else:
+            informe += "  No se encontraron ofertas para esta empresa.\n\n"
+    
+    return informe

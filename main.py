@@ -5,7 +5,8 @@ from controladores.hp import getOfertasHP
 from controladores.ibm import getOfertasIBM
 from controladores.cisco import getOfertasCisco
 from controladores.c3 import getOfertasC3
-from procesamiento import procesarOfertas
+from procesamiento import procesarOfertas, generar_msj
+from mail import sendMail, usuarios
 import time
 
 empresas=['HP', 'C3', 'Intel', 'IBM', 'Cisco','Oracle']
@@ -14,6 +15,15 @@ options = webdriver.ChromeOptions()
 #options.add_argument("--start-maximized")
 options.add_argument("--headless")
 driver = webdriver.Chrome(options=options)
+
+def enviarOfertas(mail):
+    for nuevos in usuarios['new']:
+        print(f"Enviando correo a {nuevos}")
+        sendMail(mail,nuevos)
+    for olds in usuarios['old']:
+        sendMail(mail,olds)
+    print("Se han enviado las ofertas por correo electrónico.")
+
 def getofertas(empresa, index, ofertas):
     match empresa:
         case 'HP':
@@ -90,6 +100,7 @@ if __name__ == "__main__":
     ofertas=[]
     maxIntentos=3
     tmpEmpresas = empresas.copy()
+    #"""
     while len(tmpEmpresas) > 0:
         if _%3==0 and _!=0:
             print("Esperando 5 segundos para evitar bloqueos...")
@@ -102,19 +113,11 @@ if __name__ == "__main__":
         _+=1
     print(f"Se han encontrado {len(ofertas)} ofertas de trabajo.")
     procesarOfertas(ofertas)
+    mensaje=generar_msj(empresas)
+    enviarOfertas(mensaje)
+    #"""
     #JABIL
     #MICROSOFT
     #Bosch
     #CompuTrabajo
-    """
-    index,_ = getOfertasOracle(driver, index, ofertas)
-    index,_ = getOfertasHP(driver, index, ofertas)
-    time.sleep(7)
-    index,_ = getOfertasC3(driver, index, ofertas)
-    index,_ = getOfertasIntel(driver, index, ofertas)
-    time.sleep(7)
-    index,_ = getOfertasIBM(driver, index, ofertas)
-    index,_ = getOfertasCisco(driver, index, ofertas)
-    procesarOfertas(ofertas)
-    """
     driver.quit()

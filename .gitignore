@@ -1,3 +1,4 @@
 ofertas.json
 __pycache__/
 controlador/__pycache__/
+.env
