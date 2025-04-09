@@ -7,18 +7,26 @@ import time
 def getOfertasCisco(driver,indice,ofertas):
     #url="https://jobs.cisco.com/jobs/SearchJobs/internship?21178=%5B102674%5D&21178_format=6020&21179=%5B12229585%5D&21179_format=6021&listFilterMode=1"
     url="https://jobs.cisco.com/jobs/SearchJobs/internship?21178=%5B102674%5D&21178_format=6020&21179=%5B12229443%5D&21179_format=6021&listFilterMode=1"
-    driver.get(url)
+    try:
+        driver.get(url)
+    except Exception as e:
+        print(f"Error al abrir la página de Cisco")
+        return indice, False
     # Espera a que cargue el contenedor con los listados de ofertas
-    print("Esperando a que carguen las ofertas...")
+    print("Esperando a que carguen las ofertas de Cisco...")
     ofertasTmp=[]
-    wait = WebDriverWait(driver, 30)
-    # Espera a que el contenedor esté presente en el DOM
-    job_results_container = wait.until(EC.presence_of_element_located((By.ID, "content")))
+    try:
+        wait = WebDriverWait(driver, 30)
+        # Espera a que el contenedor esté presente en el DOM
+        job_results_container = wait.until(EC.presence_of_element_located((By.ID, "content")))
 
-    rows = job_results_container.find_elements(By.TAG_NAME, "tr")
-    if rows[1].text=="No results":
-        print(f"Se encontraron 00 ofertas de empleo en Cisco")
-        return indice
+        rows = job_results_container.find_elements(By.TAG_NAME, "tr")
+        if rows[1].text=="No results":
+            print(f"Se encontraron 0 ofertas de empleo en Cisco")
+            return indice, True
+    except Exception as e:
+        print(f"Error al cargar los elementos de la página de Cisco")
+        return indice, False
     # Iteramos sobre cada oferta y extraemos la información
     for index, row in enumerate(rows, start=1):
         if index==1:
@@ -52,11 +60,8 @@ def getOfertasCisco(driver,indice,ofertas):
     print(f"Se encontraron {len(ofertasTmp)} ofertas de empleo en Cisco")
     for i, oferta in enumerate(ofertasTmp):
         oferta="Oferta: "+str(i+indice+1)+oferta
-        ofertas.append(oferta)
-
-    time.sleep(5)
-    
-    return indice+len(ofertasTmp)
+        ofertas.append(oferta)   
+    return indice+len(ofertasTmp), True
 
 
     

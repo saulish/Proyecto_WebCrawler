@@ -6,14 +6,21 @@ import time
 
 def getOfertasIBM(driver,indice,ofertas):
     url="https://www.ibm.com/mx-es/careers/search?field_keyword_18[0]=Intern&field_keyword_18[1]=Internship&field_keyword_05[0]=Mexico"
-    driver.get(url)
+    try:
+        driver.get(url)
+    except Exception as e:
+        print(f"Error al abrir la página de IBM")
+        return indice, False
     # Espera a que cargue el contenedor con los listados de ofertas
-    print("Esperando a que carguen las ofertas...")
+    print("Esperando a que carguen las ofertas de IBM...")
     ofertasTemp=[] #Lista temporal para almacenar las ofertas de mx en general
     wait = WebDriverWait(driver, 30)
-    job_results_container = wait.until(EC.presence_of_element_located((By.ID, "ibm-hits-wrapper")))
-    job_cards = job_results_container.find_elements(By.CLASS_NAME, "bx--card-group__cards__col")
-
+    try:
+        job_results_container = wait.until(EC.presence_of_element_located((By.ID, "ibm-hits-wrapper")))
+        job_cards = job_results_container.find_elements(By.CLASS_NAME, "bx--card-group__cards__col")
+    except Exception as e:
+        print(f"Error al obtener los elementos de IBM")
+        return indice, False
 
     # Iteramos sobre cada oferta y extraemos la información
     for index, card in enumerate(job_cards, start=1):
@@ -46,10 +53,8 @@ def getOfertasIBM(driver,indice,ofertas):
     for i,card in enumerate(ofertasTemp):
         card="Oferta: "+str(i+indice+1)+card
         ofertas.append(card)
-
-    time.sleep(5)
     
-    return indice+len(ofertasTemp)
+    return indice+len(ofertasTemp), True
 
 
     

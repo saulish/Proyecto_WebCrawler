@@ -5,36 +5,35 @@ import time
 
 
 def getOfertasIntel(driver, indice,ofertas):
-    url = "https://jobs.intel.com/en/search-jobs/internship/Guadalajara%2C%20Jalisco/599/1/4/3996063-4004156-8582140-4005539/20x66682/-103x39182/50/2"
-    driver.get(url)
-    # Espera a que cargue el contenedor con los listados de ofertas
-    print("Esperando a que carguen las ofertas...")
+    url = "https://intel.wd1.myworkdayjobs.com/en-US/External?q=internship&locations=1e4a4eb3adf101717b7c0175bf81decd"
+
     try:
-        wait = WebDriverWait(driver, 15)
+        driver.get(url)
     except Exception as e:
-        print(f"Error al esperar por la página: {e}")
+        print(f"Error al cargar la página de Intel")
+        return indice, False
+    # Espera a que cargue el contenedor con los listados de ofertas
+    print("Esperando a que carguen las ofertas de Intel...")
+    try:
+        wait = WebDriverWait(driver, 30)
+        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "css-1q2dra3")))
 
-    # Supongamos que los listados se encuentran en un contenedor con id 'job-results'
-    # (ajusta el selector según el HTML real)
-    job_results_container = wait.until(EC.presence_of_element_located((By.ID, "search-results-list")))
+        job_results_container = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "css-27w6p6")))  
+        job_cards = job_results_container.find_elements(By.CLASS_NAME, "css-1q2dra3")
+        print(f"Se encontraron {len(job_cards)} ofertas de empleo en Intel")
 
-    # Una vez cargado el contenedor, buscamos cada tarjeta de oferta
-    # Por ejemplo, si cada oferta está en un <div> con la clase 'job-card'
-    job_cards = job_results_container.find_elements(By.CLASS_NAME, "search-results-list-wrapper")
-
-    print(f"Se encontraron {len(job_cards)} ofertas de empleo en Intel")
+    except Exception as e:
+        print(f"Error al encontrar los elementos de la pagina de Intel")  
+        return indice, False
 
     # Iteramos sobre cada oferta y extraemos la información
     for index, card in enumerate(job_cards, start=1):
         try:
             # Extraer el título del trabajo (por ejemplo, en un <h2> con clase 'job-title')
-            jobData = card.find_element(By.CLASS_NAME, "search-title-location").text.split("\n")
-            job_title=jobData[0]
-            job_location=jobData[1]
-            
-           
+            job_title=card.find_element(By.CLASS_NAME, "css-b3pn3b").text
+            job_location=card.find_element(By.CLASS_NAME, "css-129m7dg").text       
             # Extraer el enlace a la oferta (suponiendo que se encuentre en un <a>)
-            job_link = card.find_element(By.TAG_NAME, "a").get_attribute("href")
+            job_link = card.find_element(By.CLASS_NAME, "css-19uc56f").get_attribute("href")
             oferta="Oferta: "+str(index+indice)+"\nEmpresa: Intel"+"\n"+"  Título: "+job_title+"\n"+"  Ubicación: "+job_location+"\n"+"  Link: "+job_link
             ofertas.append(oferta)
             """
@@ -47,7 +46,5 @@ def getOfertasIntel(driver, indice,ofertas):
             """
         except Exception as e:
             print(f"Error extrayendo datos de la oferta {index}: {e}")
-    # Espera un poco antes de cerrar para observar resultados (opcional)
-    time.sleep(5)
     
-    return indice+len(job_cards)
+    return indice+len(job_cards), True

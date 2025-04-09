@@ -6,17 +6,23 @@ import time
 
 def getOfertasOracle(driver,indice,ofertas):
     url="https://careers.oracle.com/jobs/#en/sites/jobsearch/requisitions?keyword=Internship&location=ZAPOPAN%2C+JALISCO%2C+Mexico&locationId=300000313566531&locationLevel=city&mode=location&radius=25&radiusUnit=KM"
-    driver.get(url)
+    try:
+        driver.get(url)
+    except Exception as e:
+        print(f"Error al cargar la página de Oracle")
+        return indice, False
     # Espera a que cargue el contenedor con los listados de ofertas
-    print("Esperando a que carguen las ofertas...")
+    print("Esperando a que carguen las ofertas de Oracle...")
 
-    wait = WebDriverWait(driver, 25)
-    job_results_container = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "jobs-grid__list")))
-    jobs_links = job_results_container.find_elements(By.TAG_NAME, "a")
-
-    job_cards = job_results_container.find_elements(By.CLASS_NAME, "job-grid-item__content")
-
-    print(f"Se encontraron {len(job_cards)} ofertas de empleo en Oracle")
+    wait = WebDriverWait(driver, 30)
+    try:
+        job_results_container = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "jobs-grid__list")))
+        jobs_links = job_results_container.find_elements(By.TAG_NAME, "a")
+        job_cards = job_results_container.find_elements(By.CLASS_NAME, "job-grid-item__content")
+        print(f"Se encontraron {len(job_cards)} ofertas de empleo en Oracle")
+    except Exception as e:
+        print(f"Error al obtener los elementos de la página de Oracle")
+        return indice, False    
 
     # Iteramos sobre cada oferta y extraemos la información
     for index, card in enumerate(job_cards, start=1):
@@ -42,10 +48,8 @@ def getOfertasOracle(driver,indice,ofertas):
             """
         except Exception as e:
             print(f"Error extrayendo datos de la oferta {index}: {e}")
-    # Espera un poco antes de cerrar para observar resultados (opcional)
-    time.sleep(5)
-    
-    return indice+len(job_cards)
+   
+    return indice+len(job_cards), True
 
 
     
