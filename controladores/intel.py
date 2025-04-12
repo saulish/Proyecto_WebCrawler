@@ -45,6 +45,6 @@ def getOfertasIntel(driver, indice,ofertas):
             print("-" * 50)
             """
         except Exception as e:
-            print(f"Error extrayendo datos de la oferta {index}: {e}")
+            print(f"Error extrayendo datos de la oferta {index}")
     
     return indice+len(job_cards), True

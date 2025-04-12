@@ -5,7 +5,7 @@ from controladores.hp import getOfertasHP
 from controladores.ibm import getOfertasIBM
 from controladores.cisco import getOfertasCisco
 from controladores.c3 import getOfertasC3
-from procesamiento import procesarOfertas, generar_msj
+from procesamiento import procesarOfertas, generar_msj, verificarJson, crearJson,updateJson, jsonToString, formatearOfertas
 from mail import sendMail, usuarios
 import time
 
@@ -24,7 +24,7 @@ def enviarOfertas(mail):
         sendMail(mail,olds)
     print("Se han enviado las ofertas por correo electrónico.")
 
-def getofertas(empresa, index, ofertas):
+def getofertas(empresa, index, ofertas, tmpEmpresas):
     match empresa:
         case 'HP':
             index, estado = getOfertasHP(driver, index, ofertas)
@@ -93,28 +93,58 @@ def getofertas(empresa, index, ofertas):
             print(f"Empresa {empresa} no reconocida")
             #intentos[empresa] += 1
 
-
-if __name__ == "__main__":
+def mainOfertas():
     index=int(0)
     _=0
     ofertas=[]
     maxIntentos=3
     tmpEmpresas = empresas.copy()
-    #"""
+    #"""  
+    
     while len(tmpEmpresas) > 0:
         if _%3==0 and _!=0:
             print("Esperando 5 segundos para evitar bloqueos...")
             time.sleep(5)
         empresa = tmpEmpresas[0]
-        getofertas(empresa, index, ofertas)
+        getofertas(empresa, index, ofertas, tmpEmpresas)
         if intentos[empresa] >= maxIntentos:
             tmpEmpresas.remove(empresa)
             print(f"Se han hecho 3 intentos fallidos para {empresa}. Se eliminará de la lista.")
         _+=1
-    print(f"Se han encontrado {len(ofertas)} ofertas de trabajo.")
-    procesarOfertas(ofertas)
-    mensaje=generar_msj(empresas)
-    enviarOfertas(mensaje)
+    return ofertas
+
+
+
+if __name__ == "__main__":
+    intervalo=180        #DEFINIMOS UN INTERVALO DE TIEMPO PARA EL ENVIO DE LOS CORREOS
+
+    while True:
+        intentos = {empresa: 0 for empresa in empresas}
+        ofertas=mainOfertas()
+        print(f"Se han encontrado {len(ofertas)} ofertas de trabajo.")
+        mensaje=""
+        ofertasProcesadas=procesarOfertas(ofertas)        #RETORNA EL JSON COMO UN DICT
+        if verificarJson():                             #SI EXISTE EL JSON
+            mensaje=updateJson(ofertasProcesadas)        #ACTUALIZA EL JSON CON LAS NUEVAS OFERTAS
+            if mensaje=="":
+                print("No se han encontrado nuevas ofertas.")
+                print(f"Esperando {intervalo} segundos para la siguiente verificación...")
+                time.sleep(intervalo) 
+                continue
+        else:
+            crearJson(ofertasProcesadas)                #TOMA LAS OFERTAS Y CREA EL JSON
+            seccion=formatearOfertas("Ofertas encontradas",ofertasProcesadas)    #TOMA EL DICT Y LO CONVIERTE EN UN STRING FORMATEADO
+            mensaje= (
+                "<html><body style='font-family: Arial, sans-serif;'>\n" +
+                seccion +
+                "\n<br><br>\n" +
+                "\n</body></html>"
+            )                                           #AÑADE LOS HEADERS Y BODY DEL HTML
+        enviarOfertas(mensaje)          #ENVIA EL CORREO
+
+
+        print(f"Esperando {intervalo} segundos para la siguiente verificación...")
+        time.sleep(intervalo)       #CADA INTERVALO VECES VAMOS A REALIZAR LA PETICION DE LOS OFERTAS Y ENVIAR LOS CORREOS
     #"""
     #JABIL
     #MICROSOFT

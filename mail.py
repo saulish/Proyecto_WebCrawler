@@ -15,11 +15,12 @@ servidor_smtp = 'smtp.gmail.com'
 puerto_smtp = 587
 
 def sendMail(cuerpo, destinatario):
-    mensaje = MIMEMultipart()
+    mensaje = MIMEMultipart("alternative")
     mensaje['From'] = remitente
     mensaje['To'] = destinatario
     mensaje['Subject'] = 'Vacantes encontradas por el Crawler'
-    mensaje.attach(MIMEText(cuerpo, 'plain'))
+    parte_html = MIMEText(cuerpo, "html")
+    mensaje.attach(parte_html)
     try:
         servidor = smtplib.SMTP(servidor_smtp, puerto_smtp)
         servidor.starttls()  # Iniciar la conexión segura

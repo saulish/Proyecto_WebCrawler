@@ -2,3 +2,4 @@ ofertas.json
 __pycache__/
 controlador/__pycache__/
 .env
+controladores/test.py
