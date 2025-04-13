@@ -93,7 +93,7 @@ def getofertas(empresa, index, ofertas, tmpEmpresas):
             print(f"Empresa {empresa} no reconocida")
             #intentos[empresa] += 1
 
-def mainOfertas():
+def mainOfertas(empresasError):
     index=int(0)
     _=0
     ofertas=[]
@@ -110,22 +110,22 @@ def mainOfertas():
         if intentos[empresa] >= maxIntentos:
             tmpEmpresas.remove(empresa)
             print(f"Se han hecho 3 intentos fallidos para {empresa}. Se eliminará de la lista.")
+            empresasError.append(empresa)           #AÑADIMOS LA EMPRESA A UNA LISTA PARA EVITAR QUE SE PROCESEN LUEGO COMO NUEVAS
         _+=1
     return ofertas
 
 
-
 if __name__ == "__main__":
-    intervalo=180        #DEFINIMOS UN INTERVALO DE TIEMPO PARA EL ENVIO DE LOS CORREOS
-
+    intervalo=3600        #DEFINIMOS UN INTERVALO DE TIEMPO PARA EL ENVIO DE LOS CORREOS
     while True:
+        empresasError=[]    #ALMACENAREMOS AQUELLAS EMPRESAS QUE NO SE PUEDAN PROCESAR
         intentos = {empresa: 0 for empresa in empresas}
-        ofertas=mainOfertas()
+        ofertas=mainOfertas(empresasError)
         print(f"Se han encontrado {len(ofertas)} ofertas de trabajo.")
         mensaje=""
         ofertasProcesadas=procesarOfertas(ofertas)        #RETORNA EL JSON COMO UN DICT
         if verificarJson():                             #SI EXISTE EL JSON
-            mensaje=updateJson(ofertasProcesadas)        #ACTUALIZA EL JSON CON LAS NUEVAS OFERTAS
+            mensaje=updateJson(ofertasProcesadas, empresasError)        #ACTUALIZA EL JSON CON LAS NUEVAS OFERTAS
             if mensaje=="":
                 print("No se han encontrado nuevas ofertas.")
                 print(f"Esperando {intervalo} segundos para la siguiente verificación...")

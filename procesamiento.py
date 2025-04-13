@@ -90,7 +90,7 @@ def formatearSeccion(heading: str, ofertas: dict) -> str:
     return "\n".join(mensaje_list)
 
 
-def updateJson(ofertasProcesadas: dict, archivo="ofertas.json") -> str:
+def updateJson(ofertasProcesadas: dict, empresaError: list, archivo="ofertas.json") -> str:
     # Convertir el diccionario a string JSON usando jsonToString
     ofertasProcesadas_str = jsonToString(ofertasProcesadas)
     
@@ -115,7 +115,12 @@ def updateJson(ofertasProcesadas: dict, archivo="ofertas.json") -> str:
         print("Error al parsear los datos JSON:", e)
         return ""
     
-    # Detectar las nuevas ofertas (las que están en data_nueva pero no en data_antigua)
+    # Incorporar al nuevo JSON las empresas que fallaron (tomándolas del JSON antiguo)
+    for empresa in empresaError:
+        if empresa in data_antigua:
+            data_nueva[empresa] = data_antigua[empresa]
+    
+    # Detectar las nuevas ofertas (aquellas que están en data_nueva pero no en data_antigua)
     nuevas_ofertas = {}
     for empresa, ofertas in data_nueva.items():
         if empresa not in data_antigua:
@@ -126,31 +131,38 @@ def updateJson(ofertasProcesadas: dict, archivo="ofertas.json") -> str:
                     if empresa not in nuevas_ofertas:
                         nuevas_ofertas[empresa] = {}
                     nuevas_ofertas[empresa][titulo] = detalles
-    if nuevas_ofertas == {}:                #EL CASO EN QUE NO HAY NUEVAS OFERTAS PERO SI CAMBIO EL JSON
+                    
+    # Si no se encontraron nuevas ofertas
+    if nuevas_ofertas == {}:
         print("No se encontraron nuevas ofertas.")
+        try:                                                #ACTUALIZAMOS EL JSON DE IGUAL FORMA POR SI SE ELIMINO ALGUNA VACANTE
+            with open(archivo, "w", encoding="utf-8") as f:
+                f.write(jsonToString(data_nueva))
+        except Exception as e:
+            print("Error al actualizar el archivo JSON:")
         return ""
+    
     # Determinar las ofertas que ya existían (vacantes pasadas disponibles)
     ofertas_pasadas = {}
     for empresa, ofertas in data_nueva.items():
         for titulo, detalles in ofertas.items():
-            if empresa in nuevas_ofertas and titulo in nuevas_ofertas[empresa]:
-                # Esta oferta es nueva; se omite en esta sección.
+            if empresa in nuevas_ofertas and titulo in nuevas_ofertas.get(empresa, {}):
+                # Oferta nueva; se omite aquí.
                 continue
             else:
                 if empresa not in ofertas_pasadas:
                     ofertas_pasadas[empresa] = {}
                 ofertas_pasadas[empresa][titulo] = detalles
-
+    
     # Actualizar el archivo JSON con el nuevo contenido
     try:
         with open(archivo, "w", encoding="utf-8") as f:
-            f.write(ofertasProcesadas_str)
+            f.write(jsonToString(data_nueva))
         print("Archivo JSON actualizado con las nuevas ofertas.")
     except Exception as e:
-        print("Error al actualizar el archivo JSON:", e)
-
+        print("Error al actualizar el archivo JSON:")
     
-    # Generar las dos secciones
+    # Generar las dos secciones en HTML
     seccion_nuevas = formatearOfertas("Nuevas vacantes", nuevas_ofertas)
     seccion_pasadas = formatearOfertas("Vacantes pasadas disponibles aún", ofertas_pasadas)
     
