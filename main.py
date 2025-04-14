@@ -25,73 +25,73 @@ def enviarOfertas(mail):
     print("Se han enviado las ofertas por correo electrónico.")
 
 def getofertas(empresa, index, ofertas, tmpEmpresas):
-    match empresa:
-        case 'HP':
-            index, estado = getOfertasHP(driver, index, ofertas)
-            if estado == True:
-                print("Ofertas de HP procesadas")
-                tmpEmpresas.remove(empresa)
-            else:
-                tmpEmpresas.remove(empresa)
-                tmpEmpresas.append(empresa)     # MANDAMOS A LA EMPRESA HASTA EL FINAL
-                intentos[empresa] += 1
-                print(f"Error al procesar ofertas de HP, intento {intentos[empresa]}")
 
-        case 'C3':  
-            index, estado = getOfertasC3(driver, index, ofertas)
-            if estado == True:
-                print("Ofertas de C3 procesadas")
-                tmpEmpresas.remove(empresa)
-            else:
-                print("Error al procesar ofertas de C3")
-                tmpEmpresas.remove(empresa)
-                tmpEmpresas.append(empresa)     # MANDAMOS A LA EMPRESA HASTA EL FINAL
-                intentos[empresa] += 1
-                print(f"Error al procesar ofertas de C3, intento {intentos[empresa]}")
-        case 'Intel':
-            index, estado= getOfertasIntel(driver, index, ofertas)
-            if estado == True:
-                print("Ofertas de Intel procesadas")
-                tmpEmpresas.remove(empresa)
-            else:
-                tmpEmpresas.remove(empresa)
-                tmpEmpresas.append(empresa)     # MANDAMOS A LA EMPRESA HASTA EL FINAL
-                intentos[empresa] += 1
-                print(f"Error al procesar ofertas de Intel, intento {intentos[empresa]}")
-        case 'IBM':
-            index, estado = getOfertasIBM(driver, index, ofertas)
-            if estado == True:
-                print("Ofertas de IBM procesadas")
-                tmpEmpresas.remove(empresa)
-            else:
-                tmpEmpresas.remove(empresa)
-                tmpEmpresas.append(empresa)     # MANDAMOS A LA EMPRESA HASTA EL FINAL
-                intentos[empresa] += 1
-                print(f"Error al procesar ofertas de IBM, intento {intentos[empresa]}")
+    if empresa== 'HP':
+        index, estado = getOfertasHP(driver, index, ofertas)
+        if estado == True:
+            print("Ofertas de HP procesadas")
+            tmpEmpresas.remove(empresa)
+        else:
+            tmpEmpresas.remove(empresa)
+            tmpEmpresas.append(empresa)     # MANDAMOS A LA EMPRESA HASTA EL FINAL
+            intentos[empresa] += 1
+            print(f"Error al procesar ofertas de HP, intento {intentos[empresa]}")
 
-        case 'Cisco':
-            index, estado = getOfertasCisco(driver, index, ofertas)
-            if estado == True:
-                print("Ofertas de Cisco procesadas")
-                tmpEmpresas.remove(empresa)
-            else:
-                tmpEmpresas.remove(empresa)
-                tmpEmpresas.append(empresa)     # MANDAMOS A LA EMPRESA HASTA EL FINAL
-                intentos[empresa] += 1
-                print(f"Error al procesar ofertas de Cisco, intento {intentos[empresa]}")
-        case 'Oracle':
-            index, estado = getOfertasOracle(driver, index, ofertas)
-            if estado == True:
-                print("Ofertas de Oracle procesadas")
-                tmpEmpresas.remove(empresa)
-            else:
-                tmpEmpresas.remove(empresa)
-                tmpEmpresas.append(empresa)     # MANDAMOS A LA EMPRESA HASTA EL FINAL
-                intentos[empresa] += 1
-                print(f"Error al procesar ofertas de Oracle, intento {intentos[empresa]}")
-        case _: 
-            print(f"Empresa {empresa} no reconocida")
-            #intentos[empresa] += 1
+    elif empresa== 'C3':  
+        index, estado = getOfertasC3(driver, index, ofertas)
+        if estado == True:
+            print("Ofertas de C3 procesadas")
+            tmpEmpresas.remove(empresa)
+        else:
+            print("Error al procesar ofertas de C3")
+            tmpEmpresas.remove(empresa)
+            tmpEmpresas.append(empresa)     # MANDAMOS A LA EMPRESA HASTA EL FINAL
+            intentos[empresa] += 1
+            print(f"Error al procesar ofertas de C3, intento {intentos[empresa]}")
+    elif empresa== 'Intel':
+        index, estado= getOfertasIntel(driver, index, ofertas)
+        if estado == True:
+            print("Ofertas de Intel procesadas")
+            tmpEmpresas.remove(empresa)
+        else:
+            tmpEmpresas.remove(empresa)
+            tmpEmpresas.append(empresa)     # MANDAMOS A LA EMPRESA HASTA EL FINAL
+            intentos[empresa] += 1
+            print(f"Error al procesar ofertas de Intel, intento {intentos[empresa]}")
+    elif empresa== 'IBM':
+        index, estado = getOfertasIBM(driver, index, ofertas)
+        if estado == True:
+            print("Ofertas de IBM procesadas")
+            tmpEmpresas.remove(empresa)
+        else:
+            tmpEmpresas.remove(empresa)
+            tmpEmpresas.append(empresa)     # MANDAMOS A LA EMPRESA HASTA EL FINAL
+            intentos[empresa] += 1
+            print(f"Error al procesar ofertas de IBM, intento {intentos[empresa]}")
+
+    elif empresa== 'Cisco':
+        index, estado = getOfertasCisco(driver, index, ofertas)
+        if estado == True:
+            print("Ofertas de Cisco procesadas")
+            tmpEmpresas.remove(empresa)
+        else:
+            tmpEmpresas.remove(empresa)
+            tmpEmpresas.append(empresa)     # MANDAMOS A LA EMPRESA HASTA EL FINAL
+            intentos[empresa] += 1
+            print(f"Error al procesar ofertas de Cisco, intento {intentos[empresa]}")
+    elif empresa== 'Oracle':
+        index, estado = getOfertasOracle(driver, index, ofertas)
+        if estado == True:
+            print("Ofertas de Oracle procesadas")
+            tmpEmpresas.remove(empresa)
+        else:
+            tmpEmpresas.remove(empresa)
+            tmpEmpresas.append(empresa)     # MANDAMOS A LA EMPRESA HASTA EL FINAL
+            intentos[empresa] += 1
+            print(f"Error al procesar ofertas de Oracle, intento {intentos[empresa]}")
+    else: 
+        print(f"Empresa {empresa} no reconocida")
+        #intentos[empresa] += 1
 
 def mainOfertas(empresasError):
     index=int(0)
